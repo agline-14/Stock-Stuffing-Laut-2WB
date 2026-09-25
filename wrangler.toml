@@ -1,0 +1,8 @@
+name = "stock-stuffing-laut"
+compatibility_date = "2026-09-25"
+pages_build_output_dir = "."
+
+[[d1_databases]]
+binding = "DB"
+database_name = "stock-stuffing"
+database_id = "GANTI_DENGAN_DATABASE_ID"

@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Stock Stuffing Laut</title>
+<style>
+*{box-sizing:border-box}body{margin:0;font-family:Arial,sans-serif;background:#f1f5f9;color:#0f172a}
+button,input,select,textarea{font:inherit}button{cursor:pointer;border:0;border-radius:8px;padding:10px 14px;font-weight:700}
+.primary{background:#0284c7;color:#fff}.success{background:#16a34a;color:#fff}.danger{background:#dc2626;color:#fff}.muted{background:#475569;color:#fff}
+header{background:#0f172a;color:#fff;padding:14px 22px;display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:5}
+header h1{font-size:19px;margin:0 0 3px}header small{color:#94a3b8}.layout{display:flex;min-height:calc(100vh - 65px)}
+aside{width:230px;background:#fff;border-right:1px solid #e2e8f0;padding:12px}.nav{width:100%;text-align:left;background:transparent;color:#334155;margin:3px 0}.nav.active,.nav:hover{background:#e0f2fe;color:#0369a1}
+main{flex:1;padding:22px}.page{display:none}.page.active{display:block}.title{margin-bottom:18px}.title h2{margin:0 0 5px}.title p{margin:0;color:#64748b}
+.cards{display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-bottom:18px}.card,.panel{background:#fff;border:1px solid #e2e8f0;border-radius:12px;padding:18px}.card small{color:#64748b}.card strong{display:block;font-size:28px;margin-top:8px}.grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px}.field label{display:block;font-size:13px;font-weight:700;margin-bottom:6px}.field input,.field select,.field textarea{width:100%;padding:10px;border:1px solid #cbd5e1;border-radius:8px}.field textarea{min-height:70px;resize:vertical}
+table{width:100%;border-collapse:collapse;min-width:800px}th,td{padding:10px;border-bottom:1px solid #e2e8f0;text-align:left;font-size:13px}th{background:#f8fafc}.tablewrap{overflow:auto}.badge{padding:4px 8px;border-radius:99px;font-size:11px;font-weight:700}.in{background:#dcfce7;color:#166534}.out{background:#fee2e2;color:#991b1b}.low{color:#dc2626;font-weight:700}
+.toolbar{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px}.toolbar input{padding:10px;border:1px solid #cbd5e1;border-radius:8px}.login{min-height:100vh;display:grid;place-items:center;background:linear-gradient(135deg,#0f172a,#0369a1);padding:20px}.loginbox{background:#fff;width:min(390px,100%);padding:30px;border-radius:16px}.loginbox h2{text-align:center;color:#0369a1}.loginbox .field{margin:14px 0}.error{color:#dc2626;font-size:13px;display:none}.hidden{display:none!important}.note{color:#64748b;font-size:12px}.modal{position:fixed;inset:0;background:#0008;display:none;place-items:center;padding:20px;z-index:10}.modalbox{background:#fff;padding:22px;border-radius:12px;width:min(520px,100%)}
+@media(max-width:1050px){.cards{grid-template-columns:repeat(3,1fr)}.grid{grid-template-columns:repeat(2,1fr)}}@media(max-width:700px){.layout{display:block}aside{width:auto;display:flex;overflow:auto}.nav{min-width:max-content;width:auto}.cards{grid-template-columns:repeat(2,1fr)}main{padding:14px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+
+<div id="login" class="login">
+  <div class="loginbox">
+    <h2>Stock Stuffing Laut</h2>
+    <p class="note" style="text-align:center">Login sistem persediaan</p>
+    <div id="loginErr" class="error">Username atau password salah.</div>
+    <div class="field"><label>Username</label><input id="lu" autocomplete="username"></div>
+    <div class="field"><label>Password</label><input id="lp" type="password" autocomplete="current-password"></div>
+    <button class="primary" style="width:100%" onclick="login()">LOGIN</button>
+    <p class="note" style="margin-top:14px">Akun awal: admin / admin123</p>
+  </div>
+</div>
+
+<div id="app" class="hidden">
+<header><div><h1>Stock Stuffing Laut</h1><small>Perlengkapan stuffing: Triplek, Bambu, Kayu, Tambang, Spon</small></div><button class="danger" onclick="logout()">Logout</button></header>
+<div class="layout">
+<aside>
+<button class="nav active" onclick="page('dashboard',this)">Dashboard</button>
+<button class="nav" onclick="page('triplek',this)">Triplek</button><button class="nav" onclick="page('bambu',this)">Bambu</button><button class="nav" onclick="page('kayu',this)">Kayu</button><button class="nav" onclick="page('tambang',this)">Tambang</button><button class="nav" onclick="page('spon',this)">Spon</button>
+<button class="nav" onclick="page('laporan',this)">Laporan</button><button class="nav" onclick="page('users',this)">User & Password</button>
+</aside>
+<main>
+<section id="dashboard" class="page active">
+<div class="title"><h2>Dashboard</h2><p>Ringkasan stok dan transaksi.</p></div>
+<div id="cards" class="cards"></div>
+<div class="panel"><h3>Transaksi Cepat</h3><div class="grid">
+<div class="field"><label>Item</label><select id="qi"><option>triplek</option><option>bambu</option><option>kayu</option><option>tambang</option><option>spon</option></select></div>
+<div class="field"><label>Jenis</label><select id="qt"><option value="masuk">Stock Masuk</option><option value="keluar">Stock Keluar</option></select></div>
+<div class="field"><label>Tanggal</label><input id="qd" type="date"></div><div class="field"><label>Quantity</label><input id="qq" type="number" min="1"></div>
+<div class="field" style="grid-column:1/-1"><label>Catatan</label><textarea id="qn" placeholder="Contoh: pemakaian stuffing container A001"></textarea></div>
+</div><br><button class="primary" onclick="saveQuick()">Simpan</button></div>
+<div class="panel"><h3>Transaksi Terbaru</h3><div class="tablewrap"><table><thead><tr><th>Tanggal</th><th>Item</th><th>Jenis</th><th>Qty</th><th>Catatan</th></tr></thead><tbody id="recent"></tbody></table></div></div>
+</section>
+
+<div id="triplek" class="page itempage"></div><div id="bambu" class="page itempage"></div><div id="kayu" class="page itempage"></div><div id="tambang" class="page itempage"></div><div id="spon" class="page itempage"></div>
+
+<section id="laporan" class="page">
+<div class="title"><h2>Laporan</h2><p>Filter transaksi, edit/hapus, dan export CSV.</p></div>
+<div class="panel"><div class="toolbar"><select id="rf"><option value="">Semua item</option><option value="triplek">Triplek</option><option value="bambu">Bambu</option><option value="kayu">Kayu</option><option value="tambang">Tambang</option><option value="spon">Spon</option></select><input id="rfrom" type="date"><input id="rto" type="date"><button class="primary" onclick="renderReport()">Tampilkan</button><button class="success" onclick="exportCSV()">Export CSV</button></div><div class="tablewrap"><table><thead><tr><th>Tanggal</th><th>Item</th><th>Jenis</th><th>Qty</th><th>Catatan</th><th>Aksi</th></tr></thead><tbody id="report"></tbody></table></div></div>
+</section>
+
+<section id="users" class="page">
+<div class="title"><h2>User & Password</h2><p>Admin dapat membuat user dan mengganti password akun sendiri.</p></div>
+<div class="panel" id="userPanel"></div>
+</section>
+</main></div></div>
+
+<div id="modal" class="modal"><div class="modalbox"><h3>Edit Transaksi</h3><div id="editForm"></div></div></div>
+
+<script>
+const ITEMS=['triplek','bambu','kayu','tambang','spon'], N={triplek:'Triplek',bambu:'Bambu',kayu:'Kayu',tambang:'Tambang',spon:'Spon'};
+let me=null, data=[], users=[];
+
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}[m]));
+const dateNow=()=>new Date().toISOString().slice(0,10);
+const fmt=d=>d?new Date(d+'T00:00:00').toLocaleDateString('id-ID'): '-';
+async function api(url,opt={}){const r=await fetch('/api'+url,{headers:{'Content-Type':'application/json',...(opt.headers||{})},...opt});const j=await r.json().catch(()=>({}));if(!r.ok)throw new Error(j.error||'Terjadi kesalahan');return j}
+
+async function login(){try{const j=await api('/login',{method:'POST',body:JSON.stringify({username:lu.value,password:lp.value})});me=j.user;showApp();await load()}catch(e){loginErr.textContent=e.message;loginErr.style.display='block'}}
+async function logout(){await api('/logout',{method:'POST'}).catch(()=>{});location.reload()}
+function showApp(){login.classList.add('hidden');app.classList.remove('hidden');qd.value=dateNow()}
+async function load(){const j=await api('/data');data=j.transactions;users=j.users||[];renderAll()}
+function page(id,b){document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));document.getElementById(id).classList.add('active');document.querySelectorAll('.nav').forEach(x=>x.classList.remove('active'));b.classList.add('active');if(ITEMS.includes(id))renderItem(id);if(id==='laporan')renderReport();if(id==='users')renderUsers()}
+function stock(item){return data.filter(x=>x.item===item).reduce((s,x)=>s+(x.type==='masuk'?+x.qty:-x.qty),0)}
+function renderAll(){renderDash();ITEMS.forEach(renderItem);renderReport();renderUsers()}
+function renderDash(){
+ cards.innerHTML=ITEMS.map(i=>`<div class="card"><small>${N[i]}</small><strong class="${stock(i)<=0?'low':''}">${stock(i)}</strong></div>`).join('');
+ const rows=[...data].sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id).slice(0,10);
+ recent.innerHTML=rows.map(x=>`<tr><td>${fmt(x.date)}</td><td>${N[x.item]}</td><td><span class="badge ${x.type==='masuk'?'in':'out'}">${x.type==='masuk'?'MASUK':'KELUAR'}</span></td><td>${x.qty}</td><td>${esc(x.note||'-')}</td></tr>`).join('')||'<tr><td colspan="5">Belum ada data.</td></tr>';
+}
+function renderItem(item){
+ const el=document.getElementById(item), rows=data.filter(x=>x.item===item).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+ el.innerHTML=`<div class="title"><h2>${N[item]}</h2><p>Stock saat ini: <b class="${stock(item)<=0?'low':''}">${stock(item)}</b></p></div>
+ <div class="panel"><h3>Input ${N[item]}</h3><div class="grid"><div class="field"><label>Jenis</label><select id="${item}t"><option value="masuk">Stock Masuk</option><option value="keluar">Stock Keluar</option></select></div><div class="field"><label>Tanggal</label><input id="${item}d" type="date" value="${dateNow()}"></div><div class="field"><label>Quantity</label><input id="${item}q" type="number" min="1"></div><div class="field"><label>Catatan</label><input id="${item}n" placeholder="Catatan"></div></div><br><button class="primary" onclick="saveItem('${item}')">Simpan</button></div>
+ <div class="panel"><h3>Riwayat ${N[item]}</h3><div class="tablewrap"><table><thead><tr><th>Tanggal</th><th>Jenis</th><th>Qty</th><th>Catatan</th><th>Aksi</th></tr></thead><tbody>${rows.map(row).join('')||'<tr><td colspan="5">Belum ada transaksi.</td></tr>'}</tbody></table></div></div>`;
+}
+function row(x){return `<tr><td>${fmt(x.date)}</td><td><span class="badge ${x.type==='masuk'?'in':'out'}">${x.type==='masuk'?'MASUK':'KELUAR'}</span></td><td>${x.qty}</td><td>${esc(x.note||'-')}</td><td><button class="muted" onclick="editTx(${x.id})">Edit</button> <button class="danger" onclick="delTx(${x.id})">Hapus</button></td></tr>`}
+async function saveItem(i){await saveTx({item:i,type:document.getElementById(i+'t').value,date:document.getElementById(i+'d').value,qty:+document.getElementById(i+'q').value,note:document.getElementById(i+'n').value})}
+async function saveQuick(){await saveTx({item:qi.value,type:qt.value,date:qd.value,qty:+qq.value,note:qn.value});qq.value='';qn.value=''}
+async function saveTx(x){try{await api('/transactions',{method:'POST',body:JSON.stringify(x)});await load();alert('Transaksi tersimpan.')}catch(e){alert(e.message)}}
+function renderReport(){
+ const f=rf.value,from=rfrom.value,to=rto.value;
+ const rows=data.filter(x=>(!f||x.item===f)&&(!from||x.date>=from)&&(!to||x.date<=to)).sort((a,b)=>b.date.localeCompare(a.date)||b.id-a.id);
+ report.innerHTML=rows.map(x=>`<tr><td>${fmt(x.date)}</td><td>${N[x.item]}</td><td><span class="badge ${x.type==='masuk'?'in':'out'}">${x.type==='masuk'?'MASUK':'KELUAR'}</span></td><td>${x.qty}</td><td>${esc(x.note||'-')}</td><td><button class="muted" onclick="editTx(${x.id})">Edit</button> <button class="danger" onclick="delTx(${x.id})">Hapus</button></td></tr>`).join('')||'<tr><td colspan="6">Data tidak ditemukan.</td></tr>';
+}
+async function delTx(id){if(!confirm('Hapus transaksi ini?'))return;try{await api('/transactions/'+id,{method:'DELETE'});await load()}catch(e){alert(e.message)}}
+function editTx(id){const x=data.find(a=>a.id===id);if(!x)return;editForm.innerHTML=`<div class="grid"><div class="field"><label>Item</label><select id="ei">${ITEMS.map(i=>`<option value="${i}" ${i===x.item?'selected':''}>${N[i]}</option>`).join('')}</select></div><div class="field"><label>Jenis</label><select id="et"><option value="masuk" ${x.type==='masuk'?'selected':''}>Stock Masuk</option><option value="keluar" ${x.type==='keluar'?'selected':''}>Stock Keluar</option></select></div><div class="field"><label>Tanggal</label><input id="ed" type="date" value="${x.date}"></div><div class="field"><label>Quantity</label><input id="eq" type="number" min="1" value="${x.qty}"></div><div class="field" style="grid-column:1/-1"><label>Catatan</label><textarea id="en">${esc(x.note||'')}</textarea></div></div><br><button class="primary" onclick="updateTx(${id})">Simpan</button> <button class="muted" onclick="closeModal()">Batal</button>`;modal.style.display='grid'}
+function closeModal(){modal.style.display='none'}
+async function updateTx(id){try{await api('/transactions/'+id,{method:'PUT',body:JSON.stringify({item:ei.value,type:et.value,date:ed.value,qty:+eq.value,note:en.value})});closeModal();await load()}catch(e){alert(e.message)}}
+function exportCSV(){const f=rf.value,from=rfrom.value,to=rto.value;const rows=data.filter(x=>(!f||x.item===f)&&(!from||x.date>=from)&&(!to||x.date<=to));let csv='Tanggal,Item,Jenis,Quantity,Catatan\\n'+rows.map(x=>[x.date,N[x.item],x.type==='masuk'?'Stock Masuk':'Stock Keluar',x.qty,'"'+String(x.note||'').replaceAll('"','""')+'"'].join(',')).join('\\n');const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([csv],{type:'text/csv'}));a.download='laporan-stock-stuffing.csv';a.click()}
+function renderUsers(){if(me.role!=='admin'){userPanel.innerHTML='<p>Menu ini hanya dapat digunakan Admin.</p>';return}userPanel.innerHTML=`<div class="grid"><div class="field"><label>Username baru</label><input id="nu"></div><div class="field"><label>Password</label><input id="np" type="password"></div><div class="field"><label>Role</label><select id="nr"><option value="user">User</option><option value="admin">Admin</option></select></div><div><button class="primary" onclick="createUser()">Tambah User</button></div></div><hr><h3>Daftar User</h3><div class="tablewrap"><table><tr><th>Username</th><th>Role</th></tr>${users.map(u=>`<tr><td>${esc(u.username)}</td><td>${u.role}</td></tr>`).join('')}</table></div><hr><h3>Ganti Password Saya</h3><div class="grid"><div class="field"><label>Password lama</label><input id="op" type="password"></div><div class="field"><label>Password baru</label><input id="newp" type="password"></div><div><button class="primary" onclick="changePassword()">Ganti Password</button></div></div>`}
+async function createUser(){try{await api('/users',{method:'POST',body:JSON.stringify({username:nu.value,password:np.value,role:nr.value})});nu.value='';np.value='';await load();alert('User dibuat.')}catch(e){alert(e.message)}}
+async function changePassword(){try{await api('/password',{method:'POST',body:JSON.stringify({oldPassword:op.value,newPassword:newp.value})});op.value='';newp.value='';alert('Password berhasil diganti.')}catch(e){alert(e.message)}}
+(async()=>{try{const j=await api('/me');me=j.user;showApp();await load()}catch(e){}})();
+</script>
+</body>
+</html>
